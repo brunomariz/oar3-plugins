@@ -18,7 +18,7 @@ You need the following dependencies:
 On debian the following command is sufficient (tested on ):
 
 ```bash
-sudo apt install libpq-dev
+sudo apt install -y libpq-dev python3-venv
 ```
 
 Install the plugin to run the test locally:
@@ -29,17 +29,24 @@ git clone https://github.com/oar-team/oar3-plugins
 
 cd oar3-plugins
 
+# Create and activate a virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
 # We use poetry install the dependencies
 pip install poetry
+
+# Lock the dependencies
+poetry lock
 
 # Install the dependencies
 poetry install
 
-# Dive into a shell containing the newly installed dependencies
-poetry shell
+# Add oar3 package 
+poetry add git+https://github.com/oar-team/oar3.git#master
 
 # Execute the tests
-pytest tests
+pytest
 ```
 
 Now that you are able to run the tests you can start developing your own plugins.
