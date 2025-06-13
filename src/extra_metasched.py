@@ -132,12 +132,6 @@ def extra_metasched_load_balancer(
         if len(resources_sorted_by_usage) > 0:
             smallest_usage_resource_number = resources_sorted_by_usage[0]
 
-            # smallest_usage_resource_id = [
-            #         resource
-            #         for resource in resource_set.hierarchy["resource_id"]
-            #         if str(resource) == str(smallest_usage_resource_number)
-            # ][0]
-
             for resource in resource_set_ids:
                 if str(resource) == str(smallest_usage_resource_number):
                     smallest_usage_resource_id = resource
