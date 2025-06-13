@@ -171,4 +171,8 @@ def test_extra_metasched_load_balancer(db, oar_conf, monkeypatch_tools):
             .filter(Job.assigned_moldable_job == AssignedResource.moldable_id)
             .order_by(Job.id)
             .all()
-        )  
+        ) 
+
+    final_assigned_resources = [r[-1] for r in result]
+    assert final_assigned_resources == [1, 2, 3, 4, 5, 1, 2, 3, 4]
+    

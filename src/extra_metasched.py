@@ -108,56 +108,56 @@ def extra_metasched_load_balancer(
 
     assigned_jobs = {}
 
-    # Initialize resource_usage_count
+    # Initialize resource_usage_count to all zeros
     resource_usage_count = {}
     for resource_id in resource_set_ids:
         resources = procset2list(resource_id)
         for resource in resources:
             resource_usage_count[resource] = 0
     
-    for waiting_job in waiting_jobs.values():
-        # For every job in scheduled_jobs, check which resource it's assigned to, and increase a counter
-        for job in scheduled_jobs:
-            job_resources = procset2list(job.res_set)
-            for job_resource in job_resources:
-                resource_usage_count[job_resource] += 1
+    # For every job in scheduled_jobs, check which resource it's assigned to, and increase a counter
+    for job in scheduled_jobs:
+        job_resources = procset2list(job.res_set)
+        for job_resource in job_resources:
+            resource_usage_count[job_resource] += 1
 
+    for waiting_job in waiting_jobs.values():
+
+        
         # Get the resource with the smallest counter
         resources_sorted_by_usage = sorted(
             resource_usage_count, key=lambda i: resource_usage_count[i]
         )
 
         if len(resources_sorted_by_usage) > 0:
-            smallest_usage_resource_id = resources_sorted_by_usage[0]
-            smallest_usage_resource = [
-                    resource
-                    for resource in resource_set.hierarchy["resource_id"]
-                    if str(resource) == str(smallest_usage_resource_id)
-            ][0]
+            smallest_usage_resource_number = resources_sorted_by_usage[0]
+
+            # smallest_usage_resource_id = [
+            #         resource
+            #         for resource in resource_set.hierarchy["resource_id"]
+            #         if str(resource) == str(smallest_usage_resource_number)
+            # ][0]
+
+            for resource in resource_set_ids:
+                if str(resource) == str(smallest_usage_resource_number):
+                    smallest_usage_resource_id = resource
+                
         else:
-            smallest_usage_resource = resource_set.hierarchy["resource_id"][-1]
+            smallest_usage_resource_id = resource_set.hierarchy["resource_id"][-1]
 
 
         # Assign the first job in waiting jobs to this resource
         # (mld_id, _, hy_res_rqts) = waiting_job.mld_res_rqts[0]
-        # import pdb
-
-        # pdb.set_trace()
         waiting_job.moldable_id = waiting_job.id
         waiting_job.start_time = initial_time_sec
-        waiting_job.res_set = smallest_usage_resource
+        waiting_job.res_set = smallest_usage_resource_id
         assigned_jobs[waiting_job.id] = waiting_job
         set_job_state(db_session, config, waiting_job.id, "toLaunch")
 
-
-        smallest_usage_resource_id = int(str(smallest_usage_resource))
-        if smallest_usage_resource_id in resource_usage_count:
-            resource_usage_count[smallest_usage_resource_id] += 1
+        if smallest_usage_resource_number in resource_usage_count:
+            resource_usage_count[smallest_usage_resource_number] += 1
         else:
-            resource_usage_count[smallest_usage_resource_id] = 1
-        
-
-
+            resource_usage_count[smallest_usage_resource_number] = 1
 
     plt.save_assigns(db_session, assigned_jobs, resource_set)
 
@@ -169,4 +169,6 @@ def extra_metasched_load_balancer(
     print(resource_set.hierarchy)
     print("RESOURCE USAGE COUNT")
     print(resource_usage_count)
+
+
 
