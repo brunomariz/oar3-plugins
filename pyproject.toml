@@ -13,6 +13,7 @@ packages = [
 [tool.poetry.dependencies]
 python = ">=3.10, <4"
 #oar = { git = "https://github.com/oar-team/oar3", branch = "master" }
+oar = {git = "https://github.com/oar-team/oar3.git", rev = "master"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"
@@ -29,6 +30,7 @@ default = "src.extra_metasched:extra_metasched_default"
 logger = "src.extra_metasched:extra_metasched_logger"
 # The function used in oar automatic tests
 foo = "src.extra_metasched:extra_metasched_foo"
+load_balancer = "src.extra_metasched:extra_metasched_load_balancer"
 
 [tool.poetry.plugins."oar.assign_func"]
 default = "src.custom_scheduling:assign_default"
