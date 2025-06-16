@@ -77,6 +77,7 @@ def extra_metasched_load_balancer(
     # Imported inside of function because there may be a better way to do things, in which case this import should be removed
 
     from procset import ProcSet
+
     # Temporary solution to get list of resources from procset.
     # Use _flatten generator
     def procset2list(procset):
@@ -109,7 +110,7 @@ def extra_metasched_load_balancer(
         resources = procset2list(resource_id)
         for resource in resources:
             resource_usage_count[resource] = 0
-    
+
     # For every job in scheduled_jobs, check which resource it's assigned to, and increase a counter
     for job in scheduled_jobs:
         job_resources = procset2list(job.res_set)
@@ -118,7 +119,6 @@ def extra_metasched_load_balancer(
 
     for waiting_job in waiting_jobs.values():
 
-        
         # Get the resource with the smallest counter
         resources_sorted_by_usage = sorted(
             resource_usage_count, key=lambda i: resource_usage_count[i]
@@ -130,10 +130,9 @@ def extra_metasched_load_balancer(
             for resource_id in resource_set_ids:
                 if str(resource_id) == str(smallest_usage_resource_number):
                     smallest_usage_resource_id = resource_id
-                
+
         else:
             smallest_usage_resource_id = resource_set.hierarchy["resource_id"][-1]
-
 
         # Assign the first job in waiting jobs to this resource
         # (mld_id, _, hy_res_rqts) = waiting_job.mld_res_rqts[0]
@@ -158,6 +157,3 @@ def extra_metasched_load_balancer(
     print(resource_set.hierarchy)
     print("RESOURCE USAGE COUNT")
     print(resource_usage_count)
-
-
-

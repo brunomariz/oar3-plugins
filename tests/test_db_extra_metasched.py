@@ -82,7 +82,6 @@ def test_db_extra_metasched_1(db, oar_conf, monkeypatch_tools):
     assert states == ["toLaunch", "Waiting", "toLaunch"]
 
 
-
 def test_extra_metasched_load_balancer(db, oar_conf, monkeypatch_tools):
     config = oar_conf
     config["EXTRA_METASCHED"] = "load_balancer"
@@ -116,10 +115,9 @@ def test_extra_metasched_load_balancer(db, oar_conf, monkeypatch_tools):
 
     # Insert more jobs
     insert_job(db, res=[(60, [("resource_id=1", "")])])
-    insert_job(db, res=[(60, [("resource_id=2", "")])])
+    insert_job(db, res=[(60, [("resource_id=1", "")])])
     insert_job(db, res=[(60, [("resource_id=1", "")])])
 
-    
     # Call the meta scheduler again to apply load balancing
     meta_schedule(db, config)
 
@@ -142,11 +140,11 @@ def test_extra_metasched_load_balancer(db, oar_conf, monkeypatch_tools):
             .filter(Job.assigned_moldable_job == AssignedResource.moldable_id)
             .order_by(Job.id)
             .all()
-        )  
+        )
 
     # Insert more jobs
     insert_job(db, res=[(60, [("resource_id=1", "")])])
-    insert_job(db, res=[(60, [("resource_id=2", "")])])
+    insert_job(db, res=[(60, [("resource_id=1", "")])])
     insert_job(db, res=[(60, [("resource_id=1", "")])])
 
     # Call the meta scheduler again to apply load balancing
@@ -171,8 +169,7 @@ def test_extra_metasched_load_balancer(db, oar_conf, monkeypatch_tools):
             .filter(Job.assigned_moldable_job == AssignedResource.moldable_id)
             .order_by(Job.id)
             .all()
-        ) 
+        )
 
     final_assigned_resources = [r[-1] for r in result]
     assert final_assigned_resources == [1, 2, 3, 4, 5, 1, 2, 3, 4]
-    
