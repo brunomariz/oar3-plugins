@@ -4,7 +4,6 @@
 from oar.lib.globals import init_config, get_logger
 from oar.lib.models import Resource
 from oar.lib.job_handling import set_job_state
-from procset import ProcSet
 
 config = init_config()
 logger = get_logger("oar-plugins.custom_extra_metasched")
@@ -75,28 +74,6 @@ def extra_metasched_load_balancer(
     #   - Check which resource has the least ammount of jobs already assigned to it (using scheduled_jobs)
     #   - Assign the job to this resource with least jobs
 
-    def procset2list(procset):
-        """Get list of integers contained in `ProcSet` intervals. Ex:
-        >>> pset = ProcSet((1, 2)).union(ProcSet((4, 5)))
-        >>> plist = procset2list(pset)
-        >>> print(plist)
-        [1, 2, 4, 5]
-
-        `ProcSet._flatten` generator produced interval start and end elements, and not a list of elements in the procset. Ex:
-        >>> pset = ProcSet((1,2)).union( ProcSet((4,5)) )
-        >>> gen = ProcSet._flatten( pset.intervals() )
-        >>> print( [i for i in gen] )
-        [(False, 1), (True, 3), (False, 4), (True, 6)]
-        """
-        procset_list = []
-        for interval in procset.intervals():
-            for i in range(interval.inf, interval.sup + 1):
-                aux = ProcSet(i)
-                if aux.intersection(procset):
-                    procset_list.append(i)
-
-        return procset_list
-
     # Jobs in queue
     waiting_jobs, waiting_jids, nb_waiting_jobs = plt.get_waiting_jobs(
         ["default"], session=db_session
@@ -111,15 +88,15 @@ def extra_metasched_load_balancer(
     # Initialize resource_usage_count to all zeros
     resource_usage_count = {}
     for resource_id in resource_set_ids:
-        resources = procset2list(resource_id)
-        for resource in resources:
-            resource_usage_count[resource] = 0
+        # resources = procset2list(resource_id)
+        for resource_id_number in resource_id:
+            resource_usage_count[resource_id_number] = 0
 
     # For every job in scheduled_jobs, check which resource it's assigned to, and increase a counter
     for job in scheduled_jobs:
-        job_resources = procset2list(job.res_set)
-        for job_resource in job_resources:
-            resource_usage_count[job_resource] += 1
+        # job_resources = procset2list(job.res_set)
+        for job_resource_number in job.res_set:
+            resource_usage_count[job_resource_number] += 1
 
     for waiting_job in waiting_jobs.values():
 
