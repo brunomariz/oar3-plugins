@@ -100,6 +100,8 @@ def extra_metasched_load_balancer(
 
     for waiting_job in waiting_jobs.values():
 
+        # TODO: get number of resources needed by waiting job, and update following steps accordingly.
+
         # Get the resource with the smallest counter
         resources_sorted_by_usage = sorted(
             resource_usage_count, key=lambda i: resource_usage_count[i]
