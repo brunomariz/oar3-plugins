@@ -128,15 +128,11 @@ def extra_metasched_load_balancer(
             resource_usage_count, key=lambda i: resource_usage_count[i]
         )
 
-        if len(resources_sorted_by_usage) > 0:
-            smallest_usage_resource_number = resources_sorted_by_usage[0]
+        smallest_usage_resource_number = resources_sorted_by_usage[0]
 
-            for resource_id in resource_set_ids:
-                if str(resource_id) == str(smallest_usage_resource_number):
-                    smallest_usage_resource_id = resource_id
-
-        else:
-            smallest_usage_resource_id = resource_set.hierarchy["resource_id"][-1]
+        for resource_id in resource_set_ids:
+            if str(resource_id) == str(smallest_usage_resource_number):
+                smallest_usage_resource_id = resource_id
 
         # Assign the first job in waiting jobs to this resource
         # (mld_id, _, hy_res_rqts) = waiting_job.mld_res_rqts[0]
