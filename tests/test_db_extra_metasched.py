@@ -86,6 +86,15 @@ def test_extra_metasched_load_balancer(db, oar_conf, monkeypatch_tools):
     config = oar_conf
     config["EXTRA_METASCHED"] = "load_balancer"
 
+    def set_jobs_to_running(jobs):
+        for job in jobs:
+            add_resource_job_pairs(db, job.id)
+            set_job_start_time_assigned_moldable_id(db, job.id, now, job.id)
+            set_job_state(db, config, job.id, "Running")
+
+    plt = Platform()
+    now = plt.get_time()
+
     insert_job(db, res=[(60, [("resource_id=1", "")])])
     insert_job(db, res=[(60, [("resource_id=1", "")])])
     insert_job(db, res=[(60, [("resource_id=1", "")])])
@@ -96,22 +105,16 @@ def test_extra_metasched_load_balancer(db, oar_conf, monkeypatch_tools):
     to_launch_jobs = db.query(Job).filter(Job.state == "toLaunch").all()
 
     # Assign jobs to resources and set jobs to running
-    for job in to_launch_jobs:
-        add_resource_job_pairs(db, job.id)
-        plt = Platform()
-        now = plt.get_time()
-        set_job_start_time_assigned_moldable_id(db, job.id, now, job.id)
+    set_jobs_to_running(to_launch_jobs)
 
-        set_job_state(db, config, job.id, "Running")
-
-        # Query jobs in Running state for debugging
-        result = (
-            db.query(Job, AssignedResource.moldable_id, AssignedResource.resource_id)
-            .filter(Job.state.in_(tuple(["Running"])))
-            .filter(Job.assigned_moldable_job == AssignedResource.moldable_id)
-            .order_by(Job.id)
-            .all()
-        )
+    # Query jobs in Running state for debugging
+    result = (
+        db.query(Job, AssignedResource.moldable_id, AssignedResource.resource_id)
+        .filter(Job.state.in_(tuple(["Running"])))
+        .filter(Job.assigned_moldable_job == AssignedResource.moldable_id)
+        .order_by(Job.id)
+        .all()
+    )
 
     # Insert more jobs
     insert_job(db, res=[(60, [("resource_id=1", "")])])
@@ -125,22 +128,16 @@ def test_extra_metasched_load_balancer(db, oar_conf, monkeypatch_tools):
     to_launch_jobs = db.query(Job).filter(Job.state == "toLaunch").all()
 
     # Assign jobs to resources and set jobs to running
-    for job in to_launch_jobs:
-        add_resource_job_pairs(db, job.id)
-        plt = Platform()
-        now = plt.get_time()
-        set_job_start_time_assigned_moldable_id(db, job.id, now, job.id)
+    set_jobs_to_running(to_launch_jobs)
 
-        set_job_state(db, config, job.id, "Running")
-
-        # Query jobs in Running state for debugging
-        result = (
-            db.query(Job, AssignedResource.moldable_id, AssignedResource.resource_id)
-            .filter(Job.state.in_(tuple(["Running"])))
-            .filter(Job.assigned_moldable_job == AssignedResource.moldable_id)
-            .order_by(Job.id)
-            .all()
-        )
+    # Query jobs in Running state for debugging
+    result = (
+        db.query(Job, AssignedResource.moldable_id, AssignedResource.resource_id)
+        .filter(Job.state.in_(tuple(["Running"])))
+        .filter(Job.assigned_moldable_job == AssignedResource.moldable_id)
+        .order_by(Job.id)
+        .all()
+    )
 
     # Insert more jobs
     insert_job(db, res=[(60, [("resource_id=1", "")])])
@@ -154,22 +151,16 @@ def test_extra_metasched_load_balancer(db, oar_conf, monkeypatch_tools):
     to_launch_jobs = db.query(Job).filter(Job.state == "toLaunch").all()
 
     # Assign jobs to resources and set jobs to running
-    for job in to_launch_jobs:
-        add_resource_job_pairs(db, job.id)
-        plt = Platform()
-        now = plt.get_time()
-        set_job_start_time_assigned_moldable_id(db, job.id, now, job.id)
+    set_jobs_to_running(to_launch_jobs)
 
-        set_job_state(db, config, job.id, "Running")
-
-        # Query jobs in Running state for debugging
-        result = (
-            db.query(Job, AssignedResource.moldable_id, AssignedResource.resource_id)
-            .filter(Job.state.in_(tuple(["Running"])))
-            .filter(Job.assigned_moldable_job == AssignedResource.moldable_id)
-            .order_by(Job.id)
-            .all()
-        )
+    # Query jobs in Running state for debugging
+    result = (
+        db.query(Job, AssignedResource.moldable_id, AssignedResource.resource_id)
+        .filter(Job.state.in_(tuple(["Running"])))
+        .filter(Job.assigned_moldable_job == AssignedResource.moldable_id)
+        .order_by(Job.id)
+        .all()
+    )
 
     final_assigned_resources = [r[-1] for r in result]
     assert final_assigned_resources == [1, 2, 3, 4, 5, 1, 2, 3, 4]
