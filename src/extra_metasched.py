@@ -81,8 +81,8 @@ def extra_metasched_load_balancer(
     # Use _flatten generator
     def procset2list(procset):
 
-        procset_lower_bound = procset._itvs[0][0]
-        procset_upper_bound = procset._itvs[-1][-1]
+        procset_lower_bound = procset.min
+        procset_upper_bound = procset.max
 
         procset_list = []
         for i in range(procset_lower_bound, procset_upper_bound + 1):
@@ -100,11 +100,6 @@ def extra_metasched_load_balancer(
     resource_set = plt.resource_set(db_session, config)
 
     resource_set_ids = resource_set.hierarchy["resource_id"]
-
-    # job_security_time = int(config["SCHEDULER_JOB_SECURITY_TIME"])
-    # plt.get_data_jobs(
-    #     db_session, waiting_jobs, waiting_jids, resource_set, job_security_time
-    # )
 
     assigned_jobs = {}
 
@@ -133,7 +128,7 @@ def extra_metasched_load_balancer(
             smallest_usage_resource_number = resources_sorted_by_usage[0]
 
             for resource_id in resource_set_ids:
-                if str(resource) == str(smallest_usage_resource_number):
+                if str(resource_id) == str(smallest_usage_resource_number):
                     smallest_usage_resource_id = resource_id
                 
         else:
