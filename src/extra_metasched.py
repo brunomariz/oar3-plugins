@@ -4,6 +4,7 @@
 from oar.lib.globals import init_config, get_logger
 from oar.lib.models import Resource
 from oar.lib.job_handling import set_job_state
+from procset import ProcSet
 
 config = init_config()
 logger = get_logger("oar-plugins.custom_extra_metasched")
@@ -74,22 +75,25 @@ def extra_metasched_load_balancer(
     #   - Check which resource has the least ammount of jobs already assigned to it (using scheduled_jobs)
     #   - Assign the job to this resource with least jobs
 
-    # Imported inside of function because there may be a better way to do things, in which case this import should be removed
-
-    from procset import ProcSet
-
-    # Temporary solution to get list of resources from procset.
-    # Use _flatten generator
     def procset2list(procset):
+        """Get list of integers contained in `ProcSet` intervals. Ex:
+        >>> pset = ProcSet((1, 2)).union(ProcSet((4, 5)))
+        >>> plist = procset2list(pset)
+        >>> print(plist)
+        [1, 2, 4, 5]
 
-        procset_lower_bound = procset.min
-        procset_upper_bound = procset.max
-
+        `ProcSet._flatten` generator produced interval start and end elements, and not a list of elements in the procset. Ex:
+        >>> pset = ProcSet((1,2)).union( ProcSet((4,5)) )
+        >>> gen = ProcSet._flatten( pset.intervals() )
+        >>> print( [i for i in gen] )
+        [(False, 1), (True, 3), (False, 4), (True, 6)]
+        """
         procset_list = []
-        for i in range(procset_lower_bound, procset_upper_bound + 1):
-            aux = ProcSet(i)
-            if aux.intersection(procset):
-                procset_list.append(i)
+        for interval in procset.intervals():
+            for i in range(interval.inf, interval.sup + 1):
+                aux = ProcSet(i)
+                if aux.intersection(procset):
+                    procset_list.append(i)
 
         return procset_list
 
